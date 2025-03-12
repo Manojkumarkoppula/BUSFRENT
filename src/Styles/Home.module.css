@@ -1,0 +1,20 @@
+.container1 {
+    background-image: url('https://img.freepik.com/premium-photo/photo-realistic-image-electric-bus-charging-station-symbolizing-green-public-transport_980716-285726.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    padding-left: 2rem;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: 2rem;
+}
+
+.content {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(211, 206, 206, 0.9);
+    font-size: 3rem;
+}
+

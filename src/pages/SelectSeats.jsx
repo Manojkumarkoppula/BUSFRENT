@@ -1,122 +1,125 @@
+import { useState, useEffect } from "react";
 import axios from "axios";
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 function SelectSeats() {
     const { busId } = useParams();
+    const navigate = useNavigate(); // For navigation to payment page
+
+    const [bus, setBus] = useState(null);
+    const [totalSeats, setTotalSeats] = useState(0);
     const [numSeats, setNumSeats] = useState(1);
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [bookedSeats, setBookedSeats] = useState([]);
     const [passengerDetails, setPassengerDetails] = useState({});
-    const [bus, setBus] = useState(null);
-    const [totalFare, setTotalFare] = useState(0);
+    const [farePerSeat, setFarePerSeat] = useState(600);
 
+    const totalFareAmount = selectedSeats.length * farePerSeat;
+
+    // Fetch bus details
     useEffect(() => {
-        axios.get(`http://localhost:8080/api/buses/${busId}`)
-            .then((response) => setBus(response.data))
-            .catch((error) => console.error("Error fetching bus details:", error));
+        const fetchBusDetails = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/buses/${busId}`);
+                setBus(response.data);
+                setFarePerSeat(response.data.fare);
+                setTotalSeats(response.data.seats);
+            } catch (error) {
+                console.error("Error fetching bus details:", error);
+            }
+        };
+        fetchBusDetails();
+    }, [busId]);
 
+    // Fetch booked seats
+    useEffect(() => {
+        const fetchBookedSeats = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/bookings/${busId}`);
+                console.log("API Response:", response.data); // Debug API response
+                
+                if (response.data && Array.isArray(response.data)) {
+                    const booked = response.data.map((booking) => booking.seatNumber);
+                    setBookedSeats(booked);
+                } else {
+                    console.error("Invalid API response format:", response.data);
+                    setBookedSeats([]);
+                }
+            } catch (error) {
+                console.error("Error fetching booked seats:", error);
+                setBookedSeats([]);
+            }
+        };
         fetchBookedSeats();
     }, [busId]);
 
-    const fetchBookedSeats = () => {
-        axios.get(`http://localhost:8080/api/booking/booked-seats?busId=${busId}`)
-            .then((response) => setBookedSeats(response.data))
-            .catch((error) => console.error("Error fetching booked seats:", error));
-    };
-
-    useEffect(() => {
-        if (bus) {
-            setTotalFare(selectedSeats.length * bus.fare);
-        } else {
-            setTotalFare(0);
-        }
-    }, [selectedSeats, bus]);
-
-    const handleNumSeatsChange = (e) => {
-        const count = parseInt(e.target.value);
-        setNumSeats(count);
-        setSelectedSeats([]);
-        setPassengerDetails({});
-    };
-
+    // Handle seat selection
     const handleSeatClick = (seat) => {
-        if (bookedSeats.includes(seat)) return;
-
-        setSelectedSeats((prevSelected) => {
-            if (prevSelected.includes(seat)) {
-                const updatedSeats = prevSelected.filter((s) => s !== seat);
-                setPassengerDetails((prevDetails) => {
-                    const updatedDetails = { ...prevDetails };
-                    delete updatedDetails[seat];
-                    return updatedDetails;
-                });
-                return updatedSeats;
+        if (bookedSeats.includes(seat)) return; // Prevent selecting booked seats
+        if (selectedSeats.includes(seat)) {
+            setSelectedSeats(selectedSeats.filter((s) => s !== seat));
+            const updatedDetails = { ...passengerDetails };
+            delete updatedDetails[seat];
+            setPassengerDetails(updatedDetails);
+        } else {
+            if (selectedSeats.length < numSeats) {
+                setSelectedSeats([...selectedSeats, seat]);
             } else {
-                if (prevSelected.length < numSeats) {
-                    return [...prevSelected, seat];
-                } else {
-                    alert(`You can only select ${numSeats} seat(s).`);
-                    return prevSelected;
-                }
+                alert(`You can only select ${numSeats} seat(s).`);
             }
+        }
+    };
+
+    // Handle passenger input
+    const handleInputChange = (seat, field, value) => {
+        setPassengerDetails({
+            ...passengerDetails,
+            [seat]: { ...passengerDetails[seat], [field]: value },
         });
     };
 
-    const handleInputChange = (seat, field, value) => {
-        setPassengerDetails((prevDetails) => ({
-            ...prevDetails,
-            [seat]: { ...prevDetails[seat], [field]: value },
-        }));
-    };
-
-    const handleSubmit = async (e) => {
+    // Handle booking submission & navigate to payment
+    const handleProceedToPayment = async (e) => {
         e.preventDefault();
-
-        if (!bus) {
-            alert("Bus details not found.");
-            return;
-        }
-
         if (selectedSeats.length !== numSeats) {
             alert(`Please select exactly ${numSeats} seat(s).`);
             return;
         }
 
-        const passengers = selectedSeats.map(seat => ({
-            name: passengerDetails[seat]?.name,
-            age: passengerDetails[seat]?.age,
-            email: passengerDetails[seat]?.email,
-        }));
+        for (let seat of selectedSeats) {
+            const details = passengerDetails[seat];
+            if (!details || !details.name || !details.age || !details.email || !details.phone) {
+                alert(`Please fill in all details for Seat ${seat}`);
+                return;
+            }
+        }
 
-        const bookingRequest = {
-            busId: bus.id,
-            seatNumbers: selectedSeats,
-            passengers: passengers,
+        const bookingData = {
+            busId: busId,
+            totalFareAmount: totalFareAmount,
+            bookingDetails: selectedSeats.map((seat) => ({ 
+                seatNumber: seat,
+                name: passengerDetails[seat].name,
+                age: passengerDetails[seat].age,
+                email: passengerDetails[seat].email,
+                phone: passengerDetails[seat].phone,
+            })),
         };
 
-        try {
-            const response = await axios.post("http://localhost:8080/api/booking/book", bookingRequest);
-            alert(response.data); // Show success message from backend
-            setSelectedSeats([]);
-            setPassengerDetails({});
-            fetchBookedSeats(); // Refresh booked seats from backend
-        } catch (error) {
-            console.error("Error booking seats:", error);
-            alert("Failed to book seats. Please try again.");
-        }
+        // Navigate to payment page with booking data
+        navigate("/payment", { state: { bookingData } });
     };
-
-    if (!bus) {
-        return <div>Loading bus details...</div>;
-    }
 
     return (
         <div className="container">
             <h1>Bus Seat Booking</h1>
-            <form onSubmit={handleSubmit}>
+            <h2>Bus ID: {busId}</h2>
+            <h2>Fare per seat:₹ {farePerSeat}</h2>
+            <h2>Total Fare:₹ {totalFareAmount}</h2>
+
+            <form onSubmit={handleProceedToPayment}>
                 <label>Select Number of Seats: </label>
-                <select value={numSeats} onChange={handleNumSeatsChange}>
+                <select value={numSeats} onChange={(e) => setNumSeats(parseInt(e.target.value))}>
                     {[1, 2, 3, 4, 5].map((num) => (
                         <option key={num} value={num}>{num}</option>
                     ))}
@@ -124,11 +127,15 @@ function SelectSeats() {
 
                 <h3>Select Your Seats:</h3>
                 <div className="seat-grid">
-                    {Array.from({ length: bus.seats }, (_, i) => i + 1).map((seat) => (
+                    {Array.from({ length: totalSeats }, (_, i) => i + 1).map((seat) => (
                         <button
                             key={seat}
                             type="button"
-                            className={`seat-button ${bookedSeats.includes(seat) ? "seat-booked" : selectedSeats.includes(seat) ? "seat-selected" : "seat-available"}`}
+                            className={`seat-button ${
+                                bookedSeats.includes(seat) ? "seat-booked" :
+                                selectedSeats.includes(seat) ? "seat-selected" :
+                                "seat-available"
+                            }`}
                             onClick={() => handleSeatClick(seat)}
                             disabled={bookedSeats.includes(seat)}
                         >
@@ -141,15 +148,38 @@ function SelectSeats() {
                 {selectedSeats.map((seat) => (
                     <div key={seat} className="passenger-details">
                         <h4>Seat {seat}</h4>
-                        <input type="text" placeholder="Name" value={passengerDetails[seat]?.name || ""} onChange={(e) => handleInputChange(seat, "name", e.target.value)} required />
-                        <input type="number" placeholder="Age" value={passengerDetails[seat]?.age || ""} onChange={(e) => handleInputChange(seat, "age", e.target.value)} required />
-                        <input type="email" placeholder="Email" value={passengerDetails[seat]?.email || ""} onChange={(e) => handleInputChange(seat, "email", e.target.value)} required />
+                        <input
+                            type="text"
+                            placeholder="Name"
+                            value={passengerDetails[seat]?.name || ""}
+                            onChange={(e) => handleInputChange(seat, "name", e.target.value)}
+                            required
+                        />
+                        <input
+                            type="number"
+                            placeholder="Age"
+                            value={passengerDetails[seat]?.age || ""}
+                            onChange={(e) => handleInputChange(seat, "age", e.target.value)}
+                            required
+                        />
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={passengerDetails[seat]?.email || ""}
+                            onChange={(e) => handleInputChange(seat, "email", e.target.value)}
+                            required
+                        />
+                        <input
+                            type="tel"
+                            placeholder="Phone Number"
+                            value={passengerDetails[seat]?.phone || ""}
+                            onChange={(e) => handleInputChange(seat, "phone", e.target.value)}
+                            required
+                        />
                     </div>
                 ))}
 
-                <h3>Total Fare: ₹{totalFare}</h3>
-
-                <button type="submit">Book Seats</button>
+                <button type="submit">Proceed to Payment</button>
             </form>
         </div>
     );

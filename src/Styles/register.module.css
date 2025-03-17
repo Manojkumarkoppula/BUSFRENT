@@ -1,0 +1,115 @@
+/* Container for the registration form */
+.registerContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: url("https://www.sustainable-bus.com/wp-content/uploads/2021/11/2021-11-23_ZF-Bus-Connect_3_2_748px.jpg") no-repeat center center/cover;
+    font-family: Arial, sans-serif;
+    position: relative;
+  }
+  
+  /* No blur effect, keeping the background image clear */
+  .registerOverlay {
+    background: rgba(0, 0, 0, 0.3); /* Slight dark overlay for readability */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  
+  /* Wrapper ensures form content stays above the overlay */
+  .registerWrapper {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+  
+  /* Heading styles */
+  .registerHeading {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Form styles */
+  .registerForm {
+    background: rgba(255, 255, 255, 0.95); /* Slight transparency */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  /* Input fields */
+  .registerInput {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .registerInput:focus {
+    border-color: #1F9ED3;
+    box-shadow: 0 0 8px #1F9ED3;
+  }
+  
+  /* Select dropdown */
+  .registerSelect {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .registerSelect:focus {
+    border-color: #1F9ED3;
+    box-shadow: 0 0 8px #1F9ED3;
+  }
+  
+  /* Button styling */
+  .registerButton {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: linear-gradient(135deg, #72838a, #1F9ED3);;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+  
+  .registerButton:hover {
+    background: linear-gradient(135deg, #72838a, #6f9fb4);
+    transform: scale(1.05);
+  }
+  
+  .registerButton:active {
+    transform: scale(0.95);
+  }
+  
+  /* Responsive design for smaller screens */
+  @media (max-width: 480px) {
+    .registerForm {
+      padding: 20px;
+    }
+  
+    .registerHeading {
+      font-size: 2rem;
+    }
+  }
+  

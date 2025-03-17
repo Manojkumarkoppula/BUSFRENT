@@ -1,12 +1,13 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import style2 from '../Styles/admin.module.css'; // Import the CSS module
 
 function AdminDashboard() {
   const [buses, setBuses] = useState([]);
   const [newBus, setNewBus] = useState({
     busNumber: "",
-    name:"",
+    name: "",
     seats: '',
     fare: '',
     source: "",
@@ -25,30 +26,33 @@ function AdminDashboard() {
   }, []);
 
   const fetchBuses = async () => {
-   
     const response = await axios.get("http://localhost:8080/api/buses");
     setBuses(response.data);
-      
   };
 
   const handleAddBus = async () => {
-      await axios.post("http://localhost:8080/api/buses", newBus,)
-      .then(alert('added sucesfully'))    
+    await axios.post("http://localhost:8080/api/buses", newBus)
+      .then(() => {
+        alert('Added successfully');
+        fetchBuses(); // Refresh the bus list after adding a new bus
+      });
   };
 
   const handleDeleteBus = async (id) => {
-    
-      await axios.delete(`http://localhost:8080/api/buses/${id}`)
-      .then(alert('deleted sucessfully'))
-      
+    await axios.delete(`http://localhost:8080/api/buses/${id}`)
+      .then(() => {
+        alert('Deleted successfully');
+        fetchBuses(); // Refresh the bus list after deleting a bus
+      });
   };
 
   return (
-    <div>
-      <h2>Admin Dashboard</h2>
+    <div className={style2.dashboardContainer}>
+      <h2 className={style2.dashboardHeading}>Admin Dashboard</h2>
 
-      <h3>Add New Bus</h3>
-      <div>
+      <div className={style2.addBusSection}>
+        <h3>Add New Bus</h3>
+        <div className={style2.inputGroup}>
           <input
             type="text"
             name="busNumber"
@@ -105,23 +109,45 @@ function AdminDashboard() {
             value={newBus.seats}
             onChange={changevalue}
           />
-          <button onClick={handleAddBus}>Add Bus</button>
+        </div>
+        <button className={style2.addButton} onClick={handleAddBus}>Add Bus</button>
       </div>
 
-      <h3>Manage Buses</h3>
-      <ul>
-        {buses.map((bus) => (
-          <li key={bus.id}>
-            Bus Number: {bus.busNumber} - Seats: {bus.seats} - Fare: {bus.fare}{" "}
-            - Source: {bus.source} - Destination: {bus.destination} - Starting
-            Time: {bus.startingTime} - Departure Date: {bus.departureDate}
-            <button onClick={() => handleDeleteBus(bus.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-
-     
-      
+      <div className={style2.manageBusesSection}>
+        <h3>Manage Buses</h3>
+        <table className={style2.busTable}>
+          <thead>
+            <tr>
+              <th>Bus Number</th>
+              <th>Bus Name</th>
+              <th>Source</th>
+              <th>Destination</th>
+              <th>Starting Time</th>
+              <th>Departure Date</th>
+              <th>Fare</th>
+              <th>Seats</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {buses.map((bus) => (
+              <tr key={bus.id}>
+                <td>{bus.busNumber}</td>
+                <td>{bus.name}</td>
+                <td>{bus.source}</td>
+                <td>{bus.destination}</td>
+                <td>{bus.startingTime}</td>
+                <td>{bus.departureDate}</td>
+                <td>{bus.fare}</td>
+                <td>{bus.seats}</td>
+                <td>
+                  <button className={style2.deleteButton} onClick={() => handleDeleteBus(bus.id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

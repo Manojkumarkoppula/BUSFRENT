@@ -1,0 +1,121 @@
+/* Container for the login form */
+.loginContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: url("https://www.sustainable-bus.com/wp-content/uploads/2021/11/2021-11-23_ZF-Bus-Connect_3_2_748px.jpg") no-repeat center center/cover;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Overlay to make text more readable */
+  .loginOverlay {
+    background: rgba(0, 0, 0, 0.6); /* Dark transparent overlay */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  
+  /* Wrapper to keep the form above the overlay */
+  .loginWrapper {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+  
+  /* Heading styles */
+  .loginHeading {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Form styles */
+  .loginForm {
+    background: rgba(255, 255, 255, 0.9); /* White with slight transparency */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  /* Input styles */
+  .loginInput {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .loginInput:focus {
+    border-color: #1F9ED3;
+    box-shadow: 0 0 8px #1F9ED3;
+  }
+  
+  /* Select dropdown styles */
+  .loginSelect {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .loginSelect:focus {
+    border-color: #1F9ED3;
+    box-shadow: 0 0 8px #1F9ED3;
+  }
+  
+  /* Button styles */
+  .loginButton {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: linear-gradient(135deg, #72838a, #1F9ED3);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+  
+  .loginButton:hover {
+    background: linear-gradient(135deg, #72838a, #6f9fb4);
+    transform: scale(1.05);
+  }
+  
+  .loginButton:active {
+    transform: scale(0.95);
+  }
+  
+  /* Error message styles */
+  .errorMessage {
+    color: #ff4d4d;
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+  
+  /* Responsive design for smaller screens */
+  @media (max-width: 480px) {
+    .loginForm {
+      padding: 20px;
+    }
+  
+    .loginHeading {
+      font-size: 2rem;
+    }
+  }
+  

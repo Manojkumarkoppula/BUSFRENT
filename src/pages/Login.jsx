@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import style3 from '../Styles/login.module.css'; // Import the CSS module
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("USER");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -12,39 +14,47 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:8080/api/login", {
-        email,
-        password,
-      });
+      // Fetch the list of users
+      const response = await axios.get("http://localhost:8080/api/users");
+      const users = response.data; // This is an array
 
-      if (response.data) {
-        const { role } = response.data; // Assuming API returns { role: "user" } or { role: "admin" }
+      // Find the user with the entered email
+      const user = users.find(u => u.email === email);
 
-        // Store user info
-        localStorage.setItem("userRole", role);
-
-        // Redirect based on role
-        if (role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/search");
-        }
+      if (!user) {
+        setError("User not found.");
+        return;
       }
-    } catch (err) {
-      setError("Invalid credentials. Please try again.");
+
+      // Validate password and role
+      if (user.password === password) {
+        if (user.role === role) {
+          if (role === "ADMIN") {
+            navigate("/admin");
+          } else {
+            navigate("/search");
+          }
+        } else {
+          setError("Role mismatch.");
+        }
+      } else {
+        setError("Invalid password.");
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleLogin}>
+    <div className={style3.loginContainer}>
+      <h2 className={style3.loginHeading}>Login</h2>
+      <form className={style3.loginForm} onSubmit={handleLogin}>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className={style3.loginInput}
           required
         />
         <input
@@ -52,9 +62,21 @@ function Login() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className={style3.loginInput}
           required
         />
-        <button type="submit">Login</button>
+        <select
+          name="role"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          className={style3.loginSelect}
+          required
+        >
+          <option value="USER">User</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+        <button type="submit" className={style3.loginButton}>Login</button>
+        {error && <p className={style3.errorMessage}>{error}</p>}
       </form>
     </div>
   );

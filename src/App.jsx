@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./Navbar"; // Import Navbar
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -13,7 +13,22 @@ import TicketPage from "./pages/TicketPage";
 function App() {
   return (
     <Router>
-      <Navbar /> {/* Single Navigation Bar */}
+      <Layout /> {/* Wrapped inside Layout */}
+    </Router>
+  );
+}
+
+// Layout Component to handle Navbar visibility
+function Layout() {
+  const location = useLocation();
+  
+  // Hide Navbar on specific pages
+  const hideNavbarPaths = ["/select-seats", "/payment", "/ticket"];
+  const shouldHideNavbar = hideNavbarPaths.some(path => location.pathname.startsWith(path));
+
+  return (
+    <>
+      {!shouldHideNavbar && <Navbar />} {/* Conditionally Render Navbar */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -24,7 +39,7 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/ticket" element={<TicketPage />} />
       </Routes>
-    </Router>
+    </>
   );
 }
 

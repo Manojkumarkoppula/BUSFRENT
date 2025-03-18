@@ -15,9 +15,9 @@ function Navbar() {
         {location.pathname === "/" && (
           <>
             <li><Link to="/search">Search</Link></li>
-            <li><Link to="#">Services</Link></li>
-            <li><Link to="#">Blog</Link></li>
-            <li><Link to="#">Contact</Link></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#contact">Contact</a></li>
           </>
         )}
       </ul>

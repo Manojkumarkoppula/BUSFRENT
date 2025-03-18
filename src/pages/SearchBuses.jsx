@@ -35,14 +35,14 @@ function SearchBuses() {
           type="text"
           placeholder="Source"
           value={source}
-          onChange={(e) => setSource(e.target.value)}
+          onChange={(e) => setSource(e.target.value.toUpperCase())}
           required
         />
         <input
           type="text"
           placeholder="Destination"
           value={destination}
-          onChange={(e) => setDestination(e.target.value)}
+          onChange={(e) => setDestination(e.target.value.toUpperCase())}
           required
         />
         <input

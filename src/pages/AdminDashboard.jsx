@@ -18,7 +18,7 @@ function AdminDashboard() {
   const navigate = useNavigate();
 
   const changevalue = (e) => {
-    setNewBus({ ...newBus, [e.target.name]: e.target.value });
+    setNewBus({ ...newBus, [e.target.name]: e.target.value.toUpperCase() });
   };
 
   useEffect(() => {
